@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><style>html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body><title>nflgt Ligaportal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: eine schmale Spalte, oben feste Reiter (Tabelle · Spieltage · Historie), darunter Karten. Dunkles Marineblau mit Gold wie die WhatsApp-Grafiken. */
+:root{
+  --bg:#0b1220; --bg2:#101a2e; --card:#141f35; --card2:#18253f; --line:#24324f;
+  --ink:#f4f6fb; --ink2:#b7c0d4; --ink3:#8792ab;
+  --accent:#e9c46a; --accent-ink:#1a1405;
+  --good:#3ecf5a; --good-bg:#12351d; --crit:#f0625a; --crit-bg:#3a1a1e; --blue:#3987e5; --blue-bg:#173a68;
+  --f-display:'Barlow Condensed','Arial Narrow',sans-serif; --f-body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.45 var(--f-body);margin:0;padding-inline:16px;padding-block:0 40px;
+  background-image:radial-gradient(1200px 500px at 70% -10%,#1a2a4d 0%,transparent 60%)}
+.wrap{max-width:720px;margin:0 auto}
+h1,h2,h3{margin:0;font-family:var(--f-display);text-wrap:balance}
+.head{padding-block:28px 14px}
+.kicker{font-family:var(--f-display);font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);font-size:15px}
+h1{font-weight:800;font-size:clamp(46px,12vw,68px);line-height:.95;text-transform:uppercase;letter-spacing:.01em;margin-top:4px}
+.sub{color:var(--ink2);font-family:var(--f-display);font-weight:600;font-size:clamp(18px,4.6vw,24px);letter-spacing:.06em;text-transform:uppercase;margin-top:6px}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:linear-gradient(var(--bg) 75%,transparent);padding-block:8px 10px;margin-inline:-16px;padding-inline:16px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--card);padding:5px;border-radius:14px}
+.tab{appearance:none;border:0;background:transparent;color:var(--ink2);font:600 15px var(--f-body);padding:10px 4px;border-radius:10px;cursor:pointer}
+.tab[aria-selected=true]{background:var(--accent);color:var(--accent-ink)}
+.tab:focus-visible,.row:focus-visible,.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.card{background:var(--card);border-radius:16px;padding:16px;margin-top:12px}
+.ctitle{font-family:var(--f-display);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-size:15px;margin-bottom:8px}
+.note{color:var(--ink3);font-size:13px;line-height:1.5}
+.legend{color:var(--ink2);font-size:13px;margin:6px 2px 10px}
+.legend b{color:var(--ink)}
+/* Tabelle */
+.tbl{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:34px 44px minmax(0,1fr) 52px 70px;align-items:center;gap:8px;background:var(--card);border-radius:14px;padding:10px 12px 10px 4px;cursor:pointer;border:0;color:inherit;text-align:left;font:inherit;width:100%}
+.row .pos{font-family:var(--f-display);font-weight:800;font-size:28px;text-align:center;line-height:1}
+.row .mv{display:block;font:600 11px var(--f-body);margin-top:2px}
+.up{color:var(--good)} .down{color:var(--crit)} .flat{color:var(--ink3)}
+.logo{width:44px;height:44px;border-radius:50%;background:var(--card2);display:block}
+.name{font-weight:600;font-size:16px;line-height:1.2;overflow-wrap:anywhere}
+.mgr{color:var(--ink3);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp{font-family:var(--f-display);font-weight:800;font-size:32px;text-align:right;line-height:1;color:var(--accent)}
+.tot{font-family:var(--f-display);font-weight:700;font-size:20px;text-align:right;color:var(--ink2);font-variant-numeric:tabular-nums}
+.th{display:grid;grid-template-columns:34px 44px minmax(0,1fr) 52px 70px;gap:8px;padding:0 12px 0 4px;color:var(--ink3);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.th div:nth-child(4),.th div:nth-child(5){text-align:right}
+.detail{background:var(--card2);border-radius:0 0 14px 14px;margin:-8px 0 0;padding:14px 14px 10px;font-size:14px}
+.detail table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.detail th{color:var(--ink3);font-size:11px;letter-spacing:.06em;text-transform:uppercase;text-align:right;font-weight:600;padding:0 0 4px}
+.detail th:first-child,.detail td:first-child{text-align:left}
+.detail td{text-align:right;padding:4px 0;border-top:1px solid var(--line)}
+.sep{display:flex;align-items:center;gap:10px;color:var(--ink3);font-size:12px;padding:6px 4px 0}
+.sep:after{content:'';flex:1;height:1px;background:var(--line)}
+.sep.gold{color:var(--accent)}
+.form{display:flex;gap:3px;margin-top:4px}
+.f{width:22px;height:18px;border-radius:5px;font:700 11px/18px var(--f-display);text-align:center;background:var(--card2);color:var(--ink2)}
+.f.t{background:var(--good-bg);color:var(--good)} .f.b{background:var(--crit-bg);color:var(--crit)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.tile{background:var(--card2);border-radius:12px;padding:12px 14px;min-width:0}
+.tile .k{font-family:var(--f-display);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:12.5px;color:var(--ink3)}
+.tile .v{font-family:var(--f-display);font-weight:800;font-size:38px;line-height:1;margin-top:4px;font-variant-numeric:tabular-nums}
+.tile .d{font-size:13.5px;color:var(--ink2);margin-top:4px}
+/* Spieltage */
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{appearance:none;border:1px solid var(--line);background:var(--card);color:var(--ink2);font:700 16px var(--f-display);letter-spacing:.04em;padding:7px 14px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.wr{display:grid;grid-template-columns:30px 40px minmax(0,1fr) 64px;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.wr:first-child{border-top:0}
+.wr .n{font-family:var(--f-display);font-weight:800;font-size:24px;text-align:center}
+.wr .logo{width:40px;height:40px}
+.bar{height:8px;border-radius:4px;background:var(--card2);margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--blue);border-radius:4px}
+.wr .p{font-family:var(--f-display);font-weight:800;font-size:26px;text-align:right;font-variant-numeric:tabular-nums}
+.wr .m{color:var(--ink3);font-size:12.5px;margin-top:2px}
+.pill{display:inline-block;border-radius:999px;padding:1px 8px;font:700 12px var(--f-display);letter-spacing:.04em;margin-left:6px;vertical-align:1px}
+.pill.g{background:var(--good-bg);color:var(--good)} .pill.r{background:var(--crit-bg);color:var(--crit)} .pill.a{background:var(--accent);color:var(--accent-ink)}
+/* Historie */
+.hero{display:flex;align-items:center;gap:16px}
+.hero .big{font-family:var(--f-display);font-weight:800;font-size:84px;line-height:.85;color:var(--accent)}
+.hero .t{font-weight:700;font-size:19px}
+.hero .d{color:var(--ink2);font-size:14px;margin-top:2px}
+.hl{display:grid;grid-template-columns:52px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.hl.h{border-top:0;color:var(--ink3);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding-block:0 4px}
+.hl .y{font-family:var(--f-display);font-weight:800;font-size:26px;line-height:1}
+.who{display:flex;align-items:center;gap:8px;min-width:0}
+.who .logo{width:34px;height:34px;flex:none}
+.ph{width:34px;height:34px;flex:none;border-radius:50%;background:var(--card2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font:800 13px var(--f-display);color:var(--ink3)}
+.who .a{font-weight:600;font-size:15px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who .b{color:var(--ink3);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who.v .a{font-weight:500;color:var(--ink2);font-size:14px}
+.era{color:var(--accent);font-family:var(--f-display);font-weight:700;letter-spacing:.16em;text-transform:uppercase;font-size:12.5px;padding:10px 0 2px}
+.scroll{overflow-x:auto}
+.et{min-width:520px}
+.er{display:grid;grid-template-columns:120px minmax(0,1fr) 30px 30px 30px;gap:6px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
+.er.h{border-top:0;color:var(--ink3);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding-block:0 4px}
+.er .nm{font-weight:600;font-size:14.5px;display:flex;gap:8px;align-items:center;min-width:0}
+.er .nm .logo{width:28px;height:28px}
+.er .nm span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.strip{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
+.strip.yr{font-size:10.5px;color:var(--ink3);text-align:center;font-weight:600}
+.c{height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font:800 13px var(--f-display);background:var(--card2);color:var(--ink3)}
+.c.cm{background:var(--accent);color:var(--accent-ink)} .c.cf{background:#6b5a2a;color:#fff3cf} .c.cp{background:var(--blue-bg);color:#cfe2ff} .c.cx{background:transparent;border:1px dashed var(--line)}
+.er .v{font-family:var(--f-display);font-weight:800;font-size:20px;text-align:center}
+.er .v.z{color:var(--ink3)}
+.leg{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2);margin-top:10px;align-items:center}
+.leg span{display:inline-flex;align-items:center;gap:5px}
+.leg .c{width:22px;height:18px;font-size:11px}
+.fact .k{font-family:var(--f-display);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:13px;color:var(--accent)}
+.fact .x{font-family:var(--f-display);font-weight:800;font-size:44px;line-height:1;margin-top:2px}
+.fact .t{font-weight:700;font-size:16px;margin-top:2px}
+.fact .d{color:var(--ink2);font-size:13.5px;margin-top:2px}
+.foot{color:var(--ink3);font-size:12.5px;line-height:1.55;margin-top:16px}
+@media (max-width:420px){
+  .row{grid-template-columns:28px 38px minmax(0,1fr) 44px 62px;gap:6px;padding-right:10px}
+  .th{grid-template-columns:28px 38px minmax(0,1fr) 44px 62px;gap:6px}
+  .logo{width:38px;height:38px}
+  .rp{font-size:28px} .tot{font-size:18px}
+  .hl{grid-template-columns:44px minmax(0,1fr) minmax(0,1fr);gap:8px}
+}
+@media (prefers-reduced-motion:no-preference){.tab,.chip{transition:background .15s,color .15s}}
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <div class="kicker">nflgt · Keeper League</div>
+    <h1>Ligaportal</h1>
+    <div class="sub" id="stand"></div>
+  </header>
+  <nav>
+    <div class="tabs" role="tablist" aria-label="Bereiche">
+      <button class="tab" role="tab" id="t-tab" aria-controls="v-tab" aria-selected="true">Tabelle</button>
+      <button class="tab" role="tab" id="t-spt" aria-controls="v-spt" aria-selected="false">Spieltage</button>
+      <button class="tab" role="tab" id="t-his" aria-controls="v-his" aria-selected="false">Historie</button>
+    </div>
+  </nav>
+
+  <section id="v-tab" role="tabpanel" aria-labelledby="t-tab"></section>
+  <section id="v-spt" role="tabpanel" aria-labelledby="t-spt" hidden></section>
+  <section id="v-his" role="tabpanel" aria-labelledby="t-his" hidden></section>
+</div>
+
+<script>
+const D = {"teams": {"Isselhorster Shotguns": {"owner": "Mathmos85", "logo": "shotguns", "mgr": "Christian"}, "JohnnyC": {"owner": "megamasi", "logo": "johnnyc", "mgr": "Pascal"}, "iPaetUnicorns": {"owner": "iPaetUnicorns", "logo": "unicorns", "mgr": "Patrick"}, "The Megatrons": {"owner": "TheMegatrons", "logo": "megatrons", "mgr": "matti"}, "B13Team8": {"owner": "B13Team8", "logo": "b13", "mgr": "Till"}, "Gronky Kongs": {"owner": "GronkyKongs89", "logo": "gronky", "mgr": "lino"}, "Forced Fumble Fuckers": {"owner": "BlessedShaggers", "logo": "fff", "mgr": "Fabian"}, "Grumpysmurfs": {"owner": "Philipp99", "logo": "grumpy", "mgr": "Philipp"}, "Team Bengalische Bestien": {"owner": "BengalischeBestien", "logo": "bengal", "mgr": "Simon"}, "Golden Era": {"owner": "Pottilicious", "logo": "golden", "mgr": "Jan"}}, "weeks": {"1": [{"team": "iPaetUnicorns", "pts": 161.66, "proj": 113.63, "opt": 177.26, "bench": 32.9}, {"team": "B13Team8", "pts": 144.46, "proj": 122.86, "opt": 150.06, "bench": 29.2}, {"team": "JohnnyC", "pts": 139.22, "proj": 116.37, "opt": 150.02, "bench": 29.4}, {"team": "The Megatrons", "pts": 134.9, "proj": 111.93, "opt": 138.46, "bench": 23.86}, {"team": "Grumpysmurfs", "pts": 128.16, "proj": 111.94, "opt": 136.16, "bench": 31.6}, {"team": "Isselhorster Shotguns", "pts": 122.46, "proj": 109.66, "opt": 137.46, "bench": 23.9}, {"team": "Team Bengalische Bestien", "pts": 121.82, "proj": 110.71, "opt": 139.1, "bench": 53.5}, {"team": "Gronky Kongs", "pts": 108.96, "proj": 114.45, "opt": 123.56, "bench": 34.9}, {"team": "Forced Fumble Fuckers", "pts": 79.5, "proj": 115.98, "opt": 103.7, "bench": 46.3}, {"team": "Golden Era", "pts": 62.44, "proj": 102.8, "opt": 69.84, "bench": 22.3}], "2": [{"team": "Isselhorster Shotguns", "pts": 148.82, "proj": 114.87, "opt": 158.12, "bench": 23.0}, {"team": "JohnnyC", "pts": 126.66, "proj": 113.81, "opt": 153.46, "bench": 47.3}, {"team": "The Megatrons", "pts": 119.56, "proj": 114.6, "opt": 139.46, "bench": 59.34}, {"team": "Forced Fumble Fuckers", "pts": 109.48, "proj": 111.85, "opt": 126.28, "bench": 26.4}, {"team": "Gronky Kongs", "pts": 108.08, "proj": 111.89, "opt": 126.18, "bench": 24.8}, {"team": "iPaetUnicorns", "pts": 97.32, "proj": 96.36, "opt": 98.92, "bench": 13.7}, {"team": "Golden Era", "pts": 90.8, "proj": 109.74, "opt": 107.2, "bench": 29.0}, {"team": "B13Team8", "pts": 90.4, "proj": 110.09, "opt": 91.4, "bench": 16.1}, {"team": "Team Bengalische Bestien", "pts": 89.52, "proj": 110.13, "opt": 94.32, "bench": 29.26}, {"team": "Grumpysmurfs", "pts": 88.28, "proj": 114.27, "opt": 90.08, "bench": 23.0}], "3": [{"team": "Golden Era", "pts": 113.6, "proj": 106.72, "opt": 114.1, "bench": 15.4}, {"team": "The Megatrons", "pts": 91.44, "proj": 112.66, "opt": 92.54, "bench": 8.9}, {"team": "iPaetUnicorns", "pts": 110.96, "proj": 111.81, "opt": 119.56, "bench": 26.4}, {"team": "JohnnyC", "pts": 116.08, "proj": 117.02, "opt": 118.98, "bench": 23.5}, {"team": "Gronky Kongs", "pts": 105.88, "proj": 106.78, "opt": 112.38, "bench": 22.4}, {"team": "Team Bengalische Bestien", "pts": 104.54, "proj": 118.23, "opt": 120.04, "bench": 41.66}, {"team": "Forced Fumble Fuckers", "pts": 125.48, "proj": 120.44, "opt": 160.08, "bench": 61.5}, {"team": "Grumpysmurfs", "pts": 148.24, "proj": 115.89, "opt": 164.04, "bench": 40.94}, {"team": "Isselhorster Shotguns", "pts": 106.96, "proj": 118.96, "opt": 114.76, "bench": 11}, {"team": "B13Team8", "pts": 85.14, "proj": 109.86, "opt": 93.04, "bench": 21.4}]}, "mgrTeam": {"Christian": "Isselhorster Shotguns", "Pascal": "JohnnyC", "Patrick": "iPaetUnicorns", "matti": "The Megatrons", "Till": "B13Team8", "lino": "Gronky Kongs", "Fabian": "Forced Fumble Fuckers", "Philipp": "Grumpysmurfs", "Simon": "Team Bengalische Bestien", "Jan": "Golden Era"}, "years": [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "finals": [{"year": 2016, "champ": ["Saint Patrick Unicorns", "Patrick"], "vice": ["Blessed Milwaukee Roadsters", "Fabian"]}, {"year": 2017, "champ": ["Saint Patrick Unicorns", "Patrick"], "vice": ["Leonidas Spartans", null]}, {"year": 2018, "champ": ["WhoDatNation", null], "vice": ["The BayButchers 49ers", null]}, {"year": 2019, "champ": ["B13 Team 8", "Till"], "vice": ["Leonidas Spartans", null]}, {"year": 2020, "champ": ["Blessed Milwaukee Roadsters", "Fabian"], "vice": ["Kattenstrother Kaengurus", null]}, {"year": 2021, "champ": ["Saint Patrick Unicorns", "Patrick"], "vice": ["Blessed Milwaukee Roadsters", "Fabian"]}, {"year": 2022, "champ": ["avenger1887", null], "vice": ["Isselhorster Shotguns", "Christian"]}, {"year": 2023, "champ": ["Isselhorster Shotguns", "Christian"], "vice": ["JohnnyC", "Pascal"]}, {"year": 2024, "champ": ["King of the Hill", "Jan"], "vice": ["JohnnyC", "Pascal"]}, {"year": 2025, "champ": ["The Megatrons", "matti"], "vice": ["Isselhorster Shotguns", "Christian"]}], "career": {"Patrick": "CCNPNCPNNP", "Fabian": "FPPNCFPPNP", "Christian": "--NPNNFCPF", "Jan": "PPPPNPPNCP", "Till": "-PNCPPNPPP", "matti": "PNNN---NNC", "Pascal": "----PNPFFN", "lino": "PPPNPPNPPN", "Simon": "------NNNN"}, "facts": [{"k": "Punkte-König ohne Krone", "x": "4×", "t": "lino", "d": "Die meisten Punkte der Saison: 2016, 2018, 2020, 2021. Nie unter den letzten zwei."}, {"k": "Endspurt-Rekord", "x": "319,88", "t": "Woche 16+17", "d": "Matti 2025, das stärkste Finale seit 2022. Jan holte 2024 299,30."}, {"k": "Fluch der Hauptrunde", "x": "2×", "t": "Erster, 0 Titel", "d": "Till gewann 2023 und 2024 die Hauptrunde und ging beide Male leer aus."}, {"k": "Knapp daneben", "x": "4,4", "t": "Punkte fehlten 2023", "d": "Pascal wurde 2023 und 2024 Vizemeister. 2023 hatte Christian nach zwei Finalwochen 4,4 Punkte mehr."}, {"k": "Dauerbrenner", "x": "4 / 4", "t": "Sleeper-Jahre in den Playoffs", "d": "Christian: Meister 2023, Vize 2022 und 2025."}, {"k": "Vize-Abo", "x": "2×", "t": "Vize, 1 Titel", "d": "Fabian: Vizemeister 2016 und 2021, dazwischen 2020 der Titel."}, {"k": "Wanderpokal", "x": "4", "t": "Meister in 4 Sleeper-Jahren", "d": "avenger1887, Christian, Jan, Matti. Titel verteidigt hat nur Patrick (2016/17)."}]};
+const LOGOS = {"b13": "data:image/webp;base64,UklGRg4DAABXRUJQVlA4IAIDAABQDACdASowADAAPrVImkqnJCIhscwA4BaJZgCdMyTDxdsljvQb87UgjzlxZ301m8x5nuzwigciDSLJcohf9THF8+COSrkwAVwJ5+tfzWD4zkHRZE7DC9rfyL303fmmLcZmAlbWADxUR1cfAAD+9W/PjyIHJnPpkUzYTdF+lKxZyMKtvX/T9tMsD2iYQ5m4p4UCGs3CDZiVhmPx/6bwZHUTk/oMGnMZ+WEMTCcZPkd2tp78vFddMLq12Pvp9dyGRmJlisZfzP/RZAsxYMqWEUVDmD6b4HJU2xaq/m3bnmmZ/HPN47491N9jlvcqlP5GOhgeGGYIW2G1j+QfUjG18+MDwzfQXTpwNBUdReqzYvh1NRBFNJ/Z+JKNm8Dq0lQYyDMzVBeyL/5VZJ5dUpDRkrmvh6/HFOywivxttsP4f94wlLt+oQiYiz/11pZWqAb9Kd4SaQnd3rlzOVwflnn8Quj74wW/sF/LGgFBDYkzxjpFlKt3Pw5r5mAqVjIyrftLKi9yYbhL/54ds+rGLnf691xbhDo2NN8qEB+hpTfr4WmYhUztxxR8qAILadhz2MYvorhZcvjevLdbl8/b57//6B2+ODtcZObm5+/5aWDQpgnXwaViva2QcrapPPpLCrlNaORL2Hc+uo32Jtwds+a9OeXtcUzxeCd0o5q0d8tzWX/3bVDAPkoyW2bbq0Q+DspqXYBTOYslu357nlQM66jHRhaGyoxUZwIBnogf3bl/y9CXxJMZuKt8vBrfGqD/q4hb5ShvyOtlqJeVIIWlXPJ2h0XEZbYX5+iaodXZ0qrqQktg86P/3c/qU9R1Wi++Y/ExvHXa2dwuvnicw15qw2fC2P4ev0O6RJDmj1Pa+K/hov3npoLm7sacEvzbQ1BNC39mPNA+MUmXn0hKRnc75zB4LlLKwosPi7SZ54s+Kd2+TtcKtdi+6l+eZ6GDcPhekUozVm56UWNAseq4mAmzqion3mSjv0fEBpJZWEnjty8oLYO8CjYTInmYyaKpc7fdKP6lbVAAAA==", "bengal": "data:image/webp;base64,UklGRkgCAABXRUJQVlA4IDwCAABQCgCdASowADAAPsFSo0ynpCMiKrqqqPAYCUAWo4WsDS3XMF5YGkaaKLF10RbEWEAl2104bHqO804CatgPj8wwM69qpHU+QLc+RZrus3fWsy1UOKXekVzi5WoiAP73gmX3B6LSSsDrWHz5XLiYoW/3+QSuLaUKG79HfzAq1/b/eVgDi6qte+J0T4NkDC9m/Y0ZAC6Ky3MIOROSw3SlfwDsItuhSK9CdLmfcaWzoPnXDXrLEP1QNY+mFCPEmfNU75jNn9IupqEevsRjlHNf14HNaj7rm66800KuO3+o+PZZiogzySk13k+0ZshDdZMYP0rmNv4+Wpsumhgto4H/PgfqDuzTfOvv+23x4Gi/ZeXzeE5YCVohlPflepd2A6N5+51Sgz9nQ9u5qvE/vf1F2BTz2nrfsoxF+D1+TNxwxXVRZbwleK7qIRg60K5chWNdwF4QvJnuLIXKo8OBz8Ks/0cvt0IJ8CdoRR9UZN4W58M0VhNIJmciQDNcSs3Ya73eCBy+cBuJT7IujnjW3lHdUbjnWUyfgvYzbwnMQZY545hrh9iCyJCMuVH+IixaVaKf6GxR1MvCjXfw6WpyWvrLU9Y87uFaSYaD5lvQTPmZS3Yut+gyf2MvWhb24eGbqMq7Om0U80Ru2hsfp+BfI9PS/fUpuDVoXKNhwmflAmuiGNbzD0UIrIrmMdmDeFS1Pm3yCjr/yCfoAkxPGiA9JbNccIhvftoOcVL+cmJslipUAB0waIxpeq8Jg02wQjXAAA==", "fff": "data:image/webp;base64,UklGRpICAABXRUJQVlA4IIYCAACQDACdASowADAAPsFIn0qno6KhtVgIAPAYCWwAnTLoPYk89EB5mwzfB/kuyNHLOlIuPWnw0OuHvdxQpnOEFs92kdWm1/cMMmYxuWOOl3Mi1mBZLspiEvHwHOPfAhuIf97tLJF4pP6lSGVIpq9QAP71lCkOkVF/khPaZPzfXBp1hYtfnOzNYNjGD0v8zS+bZAk1oxYrEWod1OQuY4UxjjmHfstGy+Y8jpSvgR6014sQ4yIFvXN0BmsQXEnhZhlN/o/wia3k0J9dv61QMHnUmDdhzK8+0Z7uNZBL4pWm+aojBnP5lK4GKDgbScZRvC2DBguolVPsIix2jn1Z+5MSwt5VnhQ/IXevntW1xRX5UsWuPGbxzbE5+Z68YdDXGw+C70QAYMSToEiANn5auy3LQJ4Hzlf1K1lQnsBEPUtdv8JOyLSaku4IIQL5caC6hFeEZ7UoEyw/TAqSI3hwD7wd1wbqD1WU/Z+739Gr8dXyNM7gEPWlKOcPeuWIxtuYOqrH+c0q5iCmgQ7L+sRXn+ZCky5DAVwE7qLfGxjiaW7p6UReskRn1hs3QNB4yjoKlZ69ftD33Y5hRETV93+joHxId9SmQ99fhFIgTYUuWx9kqi6kdElA7Uo4PESp99jCdZrertB9vxJN/rmtL+mXyM0wx3zE8G1cZ9MmO1chOIUTe0An+T2QJZ5+OI+SegnEE8XpruFYcz7F22DhA6P8t29pRrbDrlC6QYHeDFRx/saAuSwW3BYykcpAeZuOJI6aKHBwOyXo8ADmKlLJlphCWtaDc9Ja583eHxtCeCTg4fJBriIpon7EsqdAB/68loevlqiszFtlPASTTgopWnsr1EbAT+ojJnCTtyAA", "golden": "data:image/webp;base64,UklGRn4CAABXRUJQVlA4IHICAABQCwCdASowADAAPsFQoUunpKMhqqwA8BgJbACpJ1TRk1Q9ueAyy+WyDlTQPLDx6S4cm/xwFXuPp/JhpS59YufC1rf8F0PGapkSkHg/1BxDemYsesdvvhXuJBQYt5klcTTjKAAA/va0HRU8vdA7ceasWqjSoxXqE3Fqy8VTzjftCIcLRhyMjVBLNIAGf47P7Mkv1V+3+/7LxGFjIvYlSFMbB+XeY5/bLPgotXLcpnE3idIlKaa1lpOu0CkcdvCk9gxM8BMrguSEmr7MWK3eGA81whJQie1g+Vy//g0jkrYyT4r5+Arae/bxLAUXG0tliFd61oPSj+WMQVxFq5FYq2X0Ji9M9rSSol7+WGtK6Zcv5BYMMLbJ+tZh+zbUPs3xR5JMm8BokrCs79ubUb1KjzH7c+oSXCh/9CLCfFUQcmoS4kB1N7kNUSsIi+2VIlqhDqIFPXAwWCat3tqXKbDUwOXswATWbF7J0hFZeoUHCb9LaZ0cmsOrw6YSoghDm06W0H6WEXkX2fAXQhEKkCSosvGY4iWNmnuOvszawNv4455KE6BCeNj8T/cLPeSWmqYPlNV0UmlzwgssyCk/LjfnruuFxZR4cwU6tlTclQMUdnySgRMS0jEfBEy6CxniNz6MuG9eQ6aJedukrwDCGIm6FwfoRhzZ7n4AfafZhrWKHFLa7aaBshgyhIG6gBQt5KqbcJMTP7Y68rfw65fZE+Xd3WojpteDxsekaGtPA0EyYd9sHQb9ZvEFvGaqil8mHCgB8k/Dcer+mQi02MWPfmo4++zbmVYwi34hHCAjgzWJp8mdRRpS5gyE28ZlDsDFrlzk1MAAAA==", "gronky": "data:image/webp;base64,UklGRooCAABXRUJQVlA4IH4CAADQDACdASowADAAPrVInkqnJCMhtVqqqOAWiWoAnTNPgz3nbeTn22a6CU7iM2VUEjA/1XMJ+rfYIXe8Z3uC1MM4E1zGVuP8e8RyEPbZMdcH3JMSGRhE2CZPCs7TVJoXJdNkVAu72xTrCkZVqjSlAAAA/uMwBzOGMSrGP/C4LANpA4FKehfgsb4k+hmtU52EOE+xoueT80h7M5T+N5l0d+Zo7b/U9RYBsnnFZ7XXrgl8jt9QWBcE4jfxCpIMuLqRfjMPYLDvBKOQ/jJsO6F+DTJR7GLfxSS4G3UbSGlzFCB2Fxhg3NjrIS9cOzngRs4ndxQZ64DG+IgkgmG+CxpJy9kjrv5nLfw2kLy1tcb5n4AqWEExNo+6Qe0uqmCOEaETnfqkK/6OKMUGU04snYnn5jDBaoDGKIWWByh/DdPAJIS7xkq7kV+g4DcF6u2ILlAQ6aS3AZbcwexcnAKSX9aYtXe+0Z/aVsnA6Etk6A9EcwA3pvTwD1oa2oj3RbpgEfbOXy9yLnKg3v2UTFuptc+Pv7dAY80Tar8VaR3K/zX+fS82P995ZnZYNXIFTw/dRz4NCkaZNOWDDB8E42z59K4BjKMAjtAk84jq18LaRvGDb+V4Ax0KujdmWzWqLxzU//CfNtJMVBdDxCSuNm8KH62BllV2znvwO4Ets59R2cCcWJ0DeOTfWDlUbBKKlnSOusToiMs2gnyyEbCRSGCdSPiSWV3/f6tIMiB+R4E8X3TDeO/e2sCLBHzYvvn/X0+o5FzbEwidjG2+Ts4r0IeXWUWiufH7jZX4t5ZY3OnZpCQdqK8VZkLDhWdhFQvkgLWbPJCeILBZ6iEssLTpL5cS+UkAAA==", "grumpy": "data:image/webp;base64,UklGRtIBAABXRUJQVlA4IMYBAABQCQCdASowADAAPsFSokynpKMiKqlY8BgJaAC7GaAGmBpU50TvA4lEmDwc0DjXYqBuKi8BdEL0xPvRCqShfl7xIzSUFLlN57pVMrT+j/sRCYEywAD+/EO+pHU/sLHJGLoIIlhrdrGE0lxdUlGttn0cppNlmbJVWcBxEhGjdbG2lYe9U4wS+EIvj6l90HMWaATN7JLmxcrrTi3BMN9S7ZFb1h8s7RIW2Zx8anH8osvUOl7E2dIY4qsbvPumQLMsktVN1h8iILiOEjV50UfZJv7q12jmDyN+OiSpzuTqvFA78Zv4BS4DOlrA4hD1pdWL1TrG0KNJwHzduCvwUsUFcr5fdCHk7/eNPwtG27B2Ufw+0QuDI9mGYZsKqT1r8WGPQ2r1tCsCj+3PnwlrI69mhXpI3HJcuxmkX/T5t7cMLBgO95IVKKXr8n8j/eRKpAPdgWjcJNf21hM15HcP5j3PgtSYX9OLHYPZGIp8iqnzdH+wsqvtdNPg6PMEfMZsiO9IaPB+PRqg5bABVCjJd4oHmjFapmh5Z/6kyZag5Z7WpKFyUEiMOXhTZh1pqVi7CPu7fCUKpQtCDgG7T4/+VpyLI2Lidd8kwAAA", "johnnyc": "data:image/webp;base64,UklGRr4BAABXRUJQVlA4ILIBAADQCgCdASowADAAPsFQo0wnpKMiKrVdUPAYCWgAtSFBUV5qiloTtugbq5pNV1d4fnNaTqPPZlL69yUikd3W23Q9UrMq63uKyS5i5bart4DamtSkPZSSEgc3FB89NUY0wAD+/EP5uKcovWXIgrLGx4Q5KhZJu8NkKGzfKU/InNDfooRyC+lpYnFybKjy3aqPnuMJGdF5aQ0V6ebtjLnasp/ryK5Mwpx870ZUAkrxnhPXttzt5b8n74gGBeELCBK20xPz1MiR+ZXr9aDMqr3Jo1Cbs6Y24lcg4OReDyUUQ4Jh6QQooFhkHDArPALyS+HeBOaNxEEGEJMVBcpidG3Vhgx+QKdvmuFXbOgMpC9MGsezo9MTGE7sNL0z64HbKluyeAvY34nCqHmvLpyqMmMNcPB0EtD4rtK95Zol5Tv3g/ie+9XlYn2QKPlpxNAwV5rHCERHIYp8lRUtBAcHXhMgILrSl13vSgfohpkpJJBxtvMrbNHdWZ9KPYorWzZhV49YYwXW/QqjAnq2vTRvsOtlMmhjDRQxDJEmz9pUuO72O/HFKRq1EkPt5LvJKvzIu469kmgQAA==", "megatrons": "data:image/webp;base64,UklGRtQCAABXRUJQVlA4IMgCAADQDACdASowADAAPrFCm0qnI6KhuNtoAOAWCWIAg9ehECyWLMFuChYvLAYKaTVnf9rvYLXZaOV2bd1t/13UN7SO0BAr8YOuLnaLBIqPb86DpYRw3DXhTLjPaUKKtTpoBUJfzpxyvvUoXl+9JJ97HEAA/vnBKzYE44CrnYJbxtZzimsSzT8BqovL9Eu4HRd16S/XAozFU+1dPDkip4DIf9VUtIhSDlcuRwBX1vczaeW0crddFwvnvlGyu7AIBW5T/jsJVPvdn1VM670GHQxvqIFiYwduQ3M+0+Jlj/GrJ6Tg1Q4vnfik/5EPEhvL68w1CGr1alxC7bvo1og3CwSZ6PeQoP4L63SnTPelNtVnFKLnOulS/ZroUpJ8atA5RbrwKgwHes2Euvh2WgY00HK0gCPB6U+kbKuniYhd5Ehu8OzFCm6OsR5wUqWy8dCIIe4XV2pKU413Wfqjn4gVLJD2AGh70g1yiiAOllAiwsGt5b077Es0EImmBc+pRfiVy7HLNvZOUfn6IPBBSYiQfSbN9iGAZubbr+Udmc8tOFS2XlSuzkVjE81//+MXHokDYJsk3u5AaKuXLLwy/FK4WcmnqNhocxOlrQiWdfPsrUXTGNQVsV1/f/yJBUPcmwBtv5BDUgfj1geh0v/aHTpGjkpX56iRdN48M5YtT8Mdx+Sf7sCivzWgrkNzftJZcN4zrRRTLsKEB4PVnInUnI5stTdQj4MAPxMKw+C0ap+B+yI5U28xL+YXd6FCHcrQG9J7TBEp95E3Vbx/qyH1fp1bAeQRKR6AdY08vT7OobZpIlUP0AEIDtVLd5ekyycga/lfnuMJ5WsqAOAoxD9fVmCJgCwvw3xV0zin5nx++48P4DyKUnkpyUmuW5VPV0kQtbSKrldWr68zVu488woMvq/D9PDR//LrziKNdSVZF9jK2Wg/czv90li8gSJRewAA", "shotguns": "data:image/webp;base64,UklGRs4CAABXRUJQVlA4IMICAAAQDQCdASowADAAPsFSokwnpKMiKqqo8BgJZAC/a1WMJ7a+alkQGZ3ZptC2iMCVd48fRazs/VPsDfrSpNmdjiVD6+jwIfe1WH/85PBd0FT8e/hKmE9ss/hz+ee2c/i2q+sT7o5a97dynoKl3m4ay3BgAAD++lwh4hb1Qrp0mRLCO2oOqankMU6avaJq6V2r/5STLK9CsEwhkj9eR0uuY/iSR1gAaQB03YeRwMXYMeEnD+ewBoE7aAmBX+EO0xZ+2Ds8GirodkY47Uq9vKPBVgnqi/G7mcdryYbatlfoMyQevcbbX3hu/viCHg2tsPTZ9vXLkeylEomy3B+nhvCtEglbm5ZaeDDhruDko/eymexobGSdCeeVqZ9AZ74NH9KkR5RqTLDV4D6jWojvL/zRRPlUqEY2tU9fx3cWjK/Op2B75ycYbcvv8hUQF25U4rnxu/+Zs3mTdlVuOQS18h7tdFsEeQVJN8MmokotwcjPcm68FbZU6IsA82lKNRfM5nOWZ8cJB7Jy12536ntv00y5j8/EP6ALppp1qZOkglrtA2NAoF+99RQFT8TjSUNd3XyXFLXLnoIxzPH5oNyoBiYgyeJuGcv9TviPBclwms7VfAnqMTsaD2K9ohIUGUUSNn1pap1sMunqUqXAP/+C/OyTnCj7dMaF8v40IVVVnW1Kd5oPecCT1+9GwVj+r/pv1b3+r0usPn/qwGfsJu6964acwy7kDlg47EE4JlevDNzHmP2ur1plYw9UWnYFlxg+ahuZdE0l1ay6dhpza7p7oZG58taPu1NO9EtVUwaD/QTlj11RsjPGvqvEtf5d+yBoDxjN/QxOlAVi8XzH164CAn7Mj1KNsF3/LzY1g4tHbKtCjkpf8qu3y5lZG6f5TbrahRjnungH/1D9E4ebp1+VKCANXuZ+0uO0MiWnk62gguxpvzJKkIAA", "unicorns": "data:image/webp;base64,UklGRrYDAABXRUJQVlA4IKoDAABwDwCdASowADAAPq1ImEqmJKIhuNtoAMAViWwAp0e8xAnPbcC7Zt5hnyPLOFPSn4Sd4O1PurGT+801AlTEybx4/R/sFfravHsYlI1thV3Tv47/eGxQqDrSMY++pwcfg2I17PV3Aqtrfli+vuQZKxXNntDXow71ruCNVq9O4wjQLkEl+AAA/vxGvm7GTb+gYI2lLPtHkjlfwlekV9h2NJ/qqQrV5gUUfC1C/LvnmbEgaP/gPmKH1t7l6RmERrpV+xv8oz/XnHR3K88Mnv5WjMCeKUD7UVIfT19x+beBrNcp+Ty1K23GBP8yjZPimQ3iFuxmvyWP4xUeTVVbkGrZzn6ajxJUpJg8YALhL8IGjtbAyA0ytwTd5AiCZUr53UiOmg2cwNT5CN6FtPWsd6pmgui3lwQOV8LisXDHz+sfxxjWEp58s/hXcfLrutcO9luDjeIKn0jZ2Iq67/0CEJre00r6vfgpuAQ/fMi/IO2fEPH1iUnVgdTnMh5LpWPZGiSJvAxdHw9JXxj5YpaJBHRZJ8IwhnKy6kCIkibhrqMBMqJawrO1uNEAIm1JU1dNyApGplCQZlN7v9duAZOSGfF//u/G5VruA62txZSecDrH55S+KFkm+Fvf+juLOu8vdrTA7KuEvf7ij2Yoh3z01q2UkcnUYLVxMfr21ja7S7Yh17TDDG4DGKE+tT71MoB1NUJSqCpHeMDFMHQe81JDnJOlc0K78WXQUMV4/ci9MoZaq0+kRNcLgm4zvUbhbGc+f5ew7CAgC49lKMyjsQbo199OU7/VXS8FMDJBgSgrFN4y4oeEaRLw78Yh8xl6R5FD9rezbs7AXeUI3c65d5gFVLDbNmU/CsXiWdrJqXKAlcRt2wyNgbentboKNev/RU48ysfTdzCsnlrb93yX7tqYv/4WpVT91f1U6ZNeYz3klzkfHJtOzv/nL6lNt+xTOd5zS5cJX/b2egBYwP67/+Y6Jgx9IJld7DhEwcMXR44bRK67Cgy+njt45TfW7/pV5EJQp0uEo7Du3fE2+1aWqX6g+0P/9WEI0PivPhWrozL0Q3Klq0EI8LulEaFlOjm7jDhxt7yB/eYaJbnO6iG7NYGwm6073NkOUVmpUy/9Jc+nvJy89aA2klCZ+8DwHNviCZPiP3Kz00B5eK04ltyiXIZ30I0vIwqUhqVh4HYk17GCi7TffLbtEYBA0xr/JuDTZ8D4BTuyvX84Ra8fei2NiSxqc1r6+vH2GO4BGlCh2gAAAA=="};
+
+const NAMES = Object.keys(D.teams);
+const nW = Object.keys(D.weeks).length;
+const de = (x, nd = 2) => Number(x).toLocaleString('de-DE', { minimumFractionDigits: nd, maximumFractionDigits: nd });
+const $ = (id) => document.getElementById(id);
+const logo = (team, cls = 'logo') => `<img class="${cls}" src="${LOGOS[D.teams[team].logo]}" alt="" width="44" height="44">`;
+
+/* ---------- Berechnung ---------- */
+function weekRanks(w) {
+  const rows = D.weeks[w].slice().sort((a, b) => b.pts - a.pts);
+  const m = {};
+  rows.forEach((r, i) => { m[r.team] = { rank: i + 1, rp: NAMES.length - (i + 1), ...r }; });
+  return m;
+}
+function standings(upto) {
+  const acc = {};
+  NAMES.forEach((t) => { acc[t] = { team: t, rp: 0, tot: 0, ranks: [], pts: [] }; });
+  for (let w = 1; w <= upto; w++) {
+    const m = weekRanks(w);
+    NAMES.forEach((t) => { acc[t].rp += m[t].rp; acc[t].tot += m[t].pts; acc[t].ranks.push(m[t].rank); acc[t].pts.push(m[t].pts); });
+  }
+  const list = Object.values(acc).sort((a, b) => b.rp - a.rp || b.tot - a.tot);
+  list.forEach((r, i) => { r.pos = i + 1; });
+  return list;
+}
+
+/* ---------- Reiter ---------- */
+const tabs = { tab: 'v-tab', spt: 'v-spt', his: 'v-his' };
+function showTab(k) {
+  Object.entries(tabs).forEach(([key, id]) => {
+    $(id).hidden = key !== k;
+    $('t-' + key).setAttribute('aria-selected', key === k ? 'true' : 'false');
+  });
+  try { localStorage.setItem('nflgt-tab', k); } catch (e) {}
+}
+Object.keys(tabs).forEach((k) => $('t-' + k).addEventListener('click', () => showTab(k)));
+
+/* ---------- Tabelle ---------- */
+function renderTable() {
+  const cur = standings(nW);
+  const prev = nW > 1 ? standings(nW - 1) : null;
+  const prevPos = {};
+  if (prev) prev.forEach((r) => { prevPos[r.team] = r.pos; });
+  let h = `<p class="legend"><b>① Rangpunkte</b> zählen zuerst: pro Spieltag 9 für die meisten Punkte bis 0 für die wenigsten. <b>② Gesamtpunkte</b> entscheiden bei Gleichstand.</p>
+    <div class="th"><div style="text-align:center">Pl.</div><div></div><div>Team</div><div>Rang</div><div>Gesamt</div></div><div class="tbl">`;
+  cur.forEach((r) => {
+    if (r.pos === 3) h += `<div class="sep gold">Plätze 1–2 sicher in den Playoffs</div>`;
+    if (r.pos === 3) h += `<div class="sep">Plätze 3–6 spielen zwei weitere Halbfinalisten aus</div>`;
+    if (r.pos === 7) h += `<div class="sep">Ab hier nur mit Aufholjagd</div>`;
+    let mv = '<span class="mv flat">–</span>';
+    if (prev) {
+      const d = prevPos[r.team] - r.pos;
+      mv = d > 0 ? `<span class="mv up">▲${d}</span>` : d < 0 ? `<span class="mv down">▼${-d}</span>` : '<span class="mv flat">–</span>';
+    }
+    const chips = r.ranks.map((k) => `<span class="f ${k <= 3 ? 't' : k >= 8 ? 'b' : ''}">${k}</span>`).join('');
+    const det = r.ranks.map((k, i) => `<tr><td>Spieltag ${i + 1}</td><td>${de(r.pts[i])}</td><td>Platz ${k}</td><td>+${NAMES.length - k}</td></tr>`).join('');
+    h += `<button class="row" type="button" aria-expanded="false" data-team="${r.team}">
+      <div class="pos">${r.pos}${mv}</div><div>${logo(r.team)}</div>
+      <div style="min-width:0"><div class="name">${r.team}</div><div class="mgr">${D.teams[r.team].mgr} · ${D.teams[r.team].owner}</div><div class="form" aria-label="Platzierungen je Spieltag">${chips}</div></div>
+      <div class="rp">${r.rp}</div><div class="tot">${de(r.tot)}</div></button>
+      <div class="detail" hidden><table><thead><tr><th>&nbsp;</th><th>Punkte</th><th>Platz</th><th>Rangpkt.</th></tr></thead><tbody>${det}</tbody></table></div>`;
+  });
+  h += `</div>`;
+
+  // Saison-Rekorde
+  const all = [];
+  for (let w = 1; w <= nW; w++) D.weeks[w].forEach((r) => all.push({ ...r, w }));
+  const best = all.reduce((a, b) => (b.pts > a.pts ? b : a));
+  const worst = all.reduce((a, b) => (b.pts < a.pts ? b : a));
+  const waste = all.reduce((a, b) => (b.opt - b.pts > a.opt - a.pts ? b : a));
+  const eff = NAMES.map((t) => {
+    const rows = all.filter((r) => r.team === t);
+    return { t, e: rows.reduce((s, r) => s + r.pts, 0) / rows.reduce((s, r) => s + r.opt, 0) };
+  }).sort((a, b) => b.e - a.e)[0];
+  h += `<div class="card"><div class="ctitle">Saison-Rekorde</div><div class="tiles">
+    <div class="tile"><div class="k">Bester Spieltag</div><div class="v">${de(best.pts)}</div><div class="d">${best.team} · Spieltag ${best.w}</div></div>
+    <div class="tile"><div class="k">Schwächster Spieltag</div><div class="v">${de(worst.pts)}</div><div class="d">${worst.team} · Spieltag ${worst.w}</div></div>
+    <div class="tile"><div class="k">Am meisten verschenkt</div><div class="v">${de(waste.opt - waste.pts, 1)}</div><div class="d">${waste.team} · Sp. ${waste.w}: mit optimaler Aufstellung wären es ${de(waste.opt, 1)} gewesen</div></div>
+    <div class="tile"><div class="k">Beste Aufstellung</div><div class="v">${de(eff.e * 100, 1)}%</div><div class="d">${eff.t} holt im Schnitt so viel vom Möglichen</div></div>
+  </div></div>`;
+  $('v-tab').innerHTML = h;
+  $('v-tab').querySelectorAll('.row').forEach((b) => b.addEventListener('click', () => {
+    const d = b.nextElementSibling;
+    d.hidden = !d.hidden;
+    b.setAttribute('aria-expanded', d.hidden ? 'false' : 'true');
+  }));
+}
+
+/* ---------- Spieltage ---------- */
+let curWeek = nW;
+function renderWeeks() {
+  const chips = Array.from({ length: nW }, (_, i) => i + 1)
+    .map((w) => `<button class="chip" type="button" data-w="${w}" aria-pressed="${w === curWeek}">Spieltag ${w}</button>`).join('');
+  const m = weekRanks(curWeek);
+  const rows = Object.values(m).sort((a, b) => a.rank - b.rank);
+  const mx = rows[0].pts;
+  const wasteMax = Math.max(...rows.map((r) => r.opt - r.pts));
+  const benchMax = Math.max(...rows.map((r) => r.bench));
+  const list = rows.map((r) => {
+    const d = r.pts - r.proj;
+    const tag = r.rank === 1 ? '<span class="pill a">Tagessieg</span>' : '';
+    const w = r.opt - r.pts === wasteMax ? '<span class="pill r">Meiste Punkte verschenkt</span>' : '';
+    return `<div class="wr"><div class="n">${r.rank}</div><div>${logo(r.team)}</div>
+      <div style="min-width:0"><div class="name">${r.team}${tag}</div>
+        <div class="bar" role="img" aria-label="${de(r.pts)} Punkte"><i style="width:${(100 * r.pts / mx).toFixed(1)}%"></i></div>
+        <div class="m">${d >= 0 ? '+' : '−'}${de(Math.abs(d), 1)} ggü. Projektion · Optimum ${de(r.opt, 1)}${w}</div></div>
+      <div class="p">${de(r.pts)}<div class="m" style="text-align:right;font-family:var(--f-body)">+${r.rp} Rang</div></div></div>`;
+  }).join('');
+  const top = rows[0], flop = rows[rows.length - 1];
+  const over = rows.slice().sort((a, b) => (b.pts - b.proj) - (a.pts - a.proj))[0];
+  const under = rows.slice().sort((a, b) => (a.pts - a.proj) - (b.pts - b.proj))[0];
+  const benchTop = rows.find((r) => r.bench === benchMax);
+  $('v-spt').innerHTML = `<div class="card"><div class="chips" role="group" aria-label="Spieltag wählen">${chips}</div></div>
+    <div class="card"><div class="ctitle">Ergebnis Spieltag ${curWeek}</div>${list}</div>
+    <div class="card"><div class="ctitle">Auffällig</div><div class="tiles">
+      <div class="tile"><div class="k">Über Erwartung</div><div class="v up">+${de(over.pts - over.proj, 1)}</div><div class="d">${over.team}</div></div>
+      <div class="tile"><div class="k">Unter Erwartung</div><div class="v down">−${de(Math.abs(under.pts - under.proj), 1)}</div><div class="d">${under.team}</div></div>
+      <div class="tile"><div class="k">Stärkste Bank</div><div class="v">${de(benchMax, 1)}</div><div class="d">${benchTop.team} ließ so viele Punkte draußen</div></div>
+      <div class="tile"><div class="k">Abstand 1. zu 10.</div><div class="v">${de(top.pts - flop.pts, 1)}</div><div class="d">${top.team} vs. ${flop.team}</div></div>
+    </div></div>
+    <p class="foot"><b>Projektion</b> = Sleeper-Erwartung für die aufgestellten Spieler. <b>Optimum</b> = beste mögliche Aufstellung aus dem gesamten Kader. <b>Bank</b> = Punkte der nicht aufgestellten Spieler.</p>`;
+  $('v-spt').querySelectorAll('.chip').forEach((b) => b.addEventListener('click', () => { curWeek = Number(b.dataset.w); renderWeeks(); }));
+}
+
+/* ---------- Historie ---------- */
+function person(mgr, teamName, cls = 'who') {
+  if (mgr && D.mgrTeam[mgr]) {
+    const t = D.mgrTeam[mgr];
+    return `<div class="${cls}">${logo(t, 'logo')}<div style="min-width:0"><div class="a">${mgr}</div><div class="b">${teamName}</div></div></div>`;
+  }
+  const ini = teamName.split(/\s+/).slice(0, 2).map((s) => s[0]).join('').toUpperCase();
+  return `<div class="${cls}"><div class="ph">${ini}</div><div style="min-width:0"><div class="a">${teamName}</div><div class="b">ehemaliger Mitspieler</div></div></div>`;
+}
+function renderHistory() {
+  let hof = `<div class="hl h"><div>Jahr</div><div>Meister</div><div>Vizemeister</div></div><div class="era">NFL Fantasy · 2016–2021</div>`;
+  D.finals.forEach((f, i) => {
+    if (f.year === 2022) hof += `<div class="era">Sleeper · seit 2022</div>`;
+    hof += `<div class="hl"><div class="y">${f.year}</div>${person(f.champ[1], f.champ[0])}${person(f.vice[1], f.vice[0], 'who v')}</div>`;
+  });
+  const stats = Object.entries(D.career).map(([who, s]) => {
+    const c = (s.match(/C/g) || []).length, f = c + (s.match(/F/g) || []).length, p = f + (s.match(/P/g) || []).length;
+    return { who, s, c, f, p, n: s.replace(/-/g, '').length };
+  }).sort((a, b) => b.c - a.c || b.f - a.f || b.p - a.p);
+  const yrs = D.years.map((y) => `<div>${String(y).slice(2)}</div>`).join('');
+  const cellTxt = { C: '🏆', F: 'V', P: 'P', N: '', '-': '' };
+  const cls = { C: 'cm', F: 'cf', P: 'cp', N: '', '-': 'cx' };
+  const et = stats.map((r) => `<div class="er"><div class="nm">${logo(D.mgrTeam[r.who], 'logo')}<span>${r.who}</span></div>
+    <div class="strip">${[...r.s].map((ch) => `<div class="c ${cls[ch]}">${cellTxt[ch]}</div>`).join('')}</div>
+    <div class="v ${r.c ? '' : 'z'}">${r.c}</div><div class="v ${r.f ? '' : 'z'}">${r.f}</div><div class="v ${r.p ? '' : 'z'}">${r.p}</div></div>`).join('');
+  const facts = D.facts.map((f) => `<div class="tile fact"><div class="k">${f.k}</div><div class="x">${f.x}</div><div class="t">${f.t}</div><div class="d">${f.d}</div></div>`).join('');
+  $('v-his').innerHTML = `<div class="card"><div class="hero"><div class="big">3×</div><div><div class="t">Rekordmeister: Patrick</div><div class="d">2016, 2017 und 2021. Einziger Titelverteidiger der Liga-Geschichte.</div></div></div></div>
+    <div class="card"><div class="ctitle">Hall of Fame</div>${hof}
+      <p class="foot" style="margin-top:10px"><b>Seit 2022 nach unserem Format:</b> Hauptrunde Woche 1–14 nach Rangpunkten, Plätze 1–2 direkt weiter, in Woche 15 kommen die zwei Punktbesten der Plätze 3–6 weiter, Finale = Summe aus Woche 16 und 17. 2016–2021: Endplatzierung laut NFL-Fantasy-Archiv.</p></div>
+    <div class="card"><div class="ctitle">Ewige Tabelle</div><div class="scroll"><div class="et">
+      <div class="er h"><div>Manager</div><div class="strip yr">${yrs}</div><div style="text-align:center">🏆</div><div style="text-align:center">Top 2</div><div style="text-align:center">PO</div></div>${et}</div></div>
+      <div class="leg"><span><span class="c cm">🏆</span>Meister</span><span><span class="c cf">V</span>Vizemeister</span><span><span class="c cp">P</span>Playoffs</span><span><span class="c"></span>verpasst</span><span><span class="c cx"></span>nicht dabei</span></div>
+      <p class="foot" style="margin-top:10px">Playoffs = Top 6. Alte Teams ohne heutigen Manager sind nicht zugeordnet.</p></div>
+    <div class="card"><div class="ctitle">Harte Fakten</div><div class="tiles">${facts}</div></div>`;
+}
+
+$('stand').textContent = `Saison 2026 · nach Spieltag ${nW}`;
+renderTable(); renderWeeks(); renderHistory();
+let start = 'tab';
+try { const s = localStorage.getItem('nflgt-tab'); if (s && tabs[s]) start = s; } catch (e) {}
+showTab(start);
+</script>
+</body></html>
