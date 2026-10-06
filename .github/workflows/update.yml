@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: "0 4 * * 2"    # Dienstag 06:00 deutscher Sommerzeit
     - cron: "0 5 * * 2"    # Dienstag 06:00 deutscher Winterzeit
-    - cron: "0 10 * * 2"   # Dienstag Mittag: Nachzügler und Stat-Korrekturen
+    - cron: "0 6 * * 2"    # Dienstag 08:00 (Winterzeit 07:00): Nachzügler und Stat-Korrekturen
   workflow_dispatch:       # Knopf "Run workflow" für ein Update von Hand
   push:
     branches: [main]       # Änderungen am Portal sofort veröffentlichen
