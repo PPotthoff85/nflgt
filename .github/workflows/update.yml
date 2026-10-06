@@ -1,0 +1,52 @@
+name: Tabelle aktualisieren
+
+on:
+  schedule:
+    - cron: "0 4 * * 2"    # Dienstag 06:00 deutscher Sommerzeit
+    - cron: "0 5 * * 2"    # Dienstag 06:00 deutscher Winterzeit
+    - cron: "0 10 * * 2"   # Dienstag Mittag: Nachzügler und Stat-Korrekturen
+  workflow_dispatch:       # Knopf "Run workflow" für ein Update von Hand
+  push:
+    branches: [main]       # Änderungen am Portal sofort veröffentlichen
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Spieltage von Sleeper holen
+        if: github.event_name != 'push'
+        run: python3 update.py
+
+      - name: Änderung speichern
+        if: github.event_name != 'push'
+        run: |
+          git config user.name "nflgt-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "Keine neuen Daten."
+          else
+            git commit -m "Automatisches Update: neue Spieltage"
+            git push
+          fi
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
+      - id: deploy
+        uses: actions/deploy-pages@v4
