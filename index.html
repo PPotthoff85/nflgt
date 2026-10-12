@@ -23,7 +23,7 @@ h1,h2,h3{margin:0;font-family:var(--f-display);text-wrap:balance}
 h1{font-weight:800;font-size:clamp(46px,12vw,68px);line-height:.95;text-transform:uppercase;letter-spacing:.01em;margin-top:4px}
 .sub{color:var(--ink2);font-family:var(--f-display);font-weight:600;font-size:clamp(18px,4.6vw,24px);letter-spacing:.06em;text-transform:uppercase;margin-top:6px}
 nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:linear-gradient(var(--bg) 75%,transparent);padding-block:8px 10px;margin-inline:-16px;padding-inline:16px}
-.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;background:var(--card);padding:5px;border-radius:14px}
+.tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;background:var(--card);padding:5px;border-radius:14px}
 .tab{appearance:none;border:0;background:transparent;color:var(--ink2);font:600 15px var(--f-body);padding:10px 4px;border-radius:10px;cursor:pointer}
 .tab[aria-selected=true]{background:var(--accent);color:var(--accent-ink)}
 .tab:focus-visible,.row:focus-visible,.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -148,6 +148,28 @@ nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:linear
 .exh figcaption{color:var(--ink3);font-size:12.5px;margin-top:10px;text-align:center;font-style:italic}
 .quote{font-family:var(--f-display);font-weight:700;font-size:26px;line-height:1.1}
 .quote small{display:block;font:400 13px var(--f-body);color:var(--ink3);margin-top:6px}
+/* Regeln */
+.rl{display:flex;flex-direction:column;gap:8px}
+.ru{display:grid;grid-template-columns:38px minmax(0,1fr);gap:12px;background:var(--card2);border-radius:12px;padding:12px 14px 12px 10px}
+.ru .nr{font-family:var(--f-display);font-weight:800;font-size:26px;line-height:1;color:var(--accent-ink);background:var(--accent);border-radius:8px;height:38px;display:flex;align-items:center;justify-content:center}
+.ru.fmt .nr{background:var(--card);color:var(--accent);font-size:20px}
+.ru.vor .nr{background:var(--blue-bg);color:#cfe2ff}
+.ru .t{font-weight:600;font-size:15.5px;line-height:1.3}
+.ru .x{color:var(--ink2);font-size:14px;margin-top:3px}
+.ru ul{margin:6px 0 0;padding-left:18px;color:var(--ink2);font-size:14px}
+.ru li{margin-top:3px}
+.ru b{color:var(--ink)}
+.rhero h2{font-weight:800;font-size:clamp(36px,10vw,52px);line-height:.9;text-transform:uppercase}
+.rhero p{color:var(--ink2);margin:8px 0 0;font-size:14px}
+.vote{display:inline-block;background:var(--blue-bg);color:#cfe2ff;font:700 12px var(--f-body);letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 10px;margin-left:6px;vertical-align:middle}
+.ctitle.blu{color:#7fb2ff}
+.card.prop{border:1px solid var(--blue)}
+.tl{display:grid;grid-template-columns:86px minmax(0,1fr);gap:6px 10px;margin-top:10px;font-size:14px}
+.tl .k{font-family:var(--f-display);font-weight:800;font-size:17px;background:var(--blue-bg);color:#cfe2ff;border-radius:8px;text-align:center;padding:5px 4px}
+.tl .v{background:var(--card2);border-radius:8px;padding:6px 10px;color:var(--ink2)}
+.tl .v b{color:var(--ink)}
+.info{margin-top:10px;background:var(--card2);border-left:3px solid var(--blue);border-radius:8px;padding:10px 12px;font-size:13.5px;color:var(--ink2)}
+@media (max-width:560px){.tabs{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:420px){
   .tab{font-size:12.5px;padding:10px 1px}
   .row{grid-template-columns:28px 38px minmax(0,1fr) 44px 62px;gap:6px;padding-right:10px}
@@ -169,6 +191,7 @@ nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:linear
     <div class="tabs" role="tablist" aria-label="Bereiche">
       <button class="tab" role="tab" id="t-tab" aria-controls="v-tab" aria-selected="true">Tabelle</button>
       <button class="tab" role="tab" id="t-spt" aria-controls="v-spt" aria-selected="false">Spieltage</button>
+      <button class="tab" role="tab" id="t-rul" aria-controls="v-rul" aria-selected="false">Regeln</button>
       <button class="tab" role="tab" id="t-his" aria-controls="v-his" aria-selected="false">Historie</button>
       <button class="tab" role="tab" id="t-sha" aria-controls="v-sha" aria-selected="false">Shame</button>
       <button class="tab" role="tab" id="t-mus" aria-controls="v-mus" aria-selected="false">Museum</button>
@@ -177,6 +200,7 @@ nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:linear
 
   <section id="v-tab" role="tabpanel" aria-labelledby="t-tab"></section>
   <section id="v-spt" role="tabpanel" aria-labelledby="t-spt" hidden></section>
+  <section id="v-rul" role="tabpanel" aria-labelledby="t-rul" hidden></section>
   <section id="v-his" role="tabpanel" aria-labelledby="t-his" hidden></section>
   <section id="v-sha" role="tabpanel" aria-labelledby="t-sha" hidden></section>
   <section id="v-mus" role="tabpanel" aria-labelledby="t-mus" hidden></section>
@@ -213,7 +237,7 @@ function standings(upto) {
 }
 
 /* ---------- Reiter ---------- */
-const tabs = { tab: 'v-tab', spt: 'v-spt', his: 'v-his', sha: 'v-sha', mus: 'v-mus' };
+const tabs = { tab: 'v-tab', spt: 'v-spt', rul: 'v-rul', his: 'v-his', sha: 'v-sha', mus: 'v-mus' };
 function showTab(k) {
   Object.entries(tabs).forEach(([key, id]) => {
     $(id).hidden = key !== k;
@@ -396,6 +420,63 @@ function renderShame() {
     <p class="foot">Alle Einträge ohne Gewähr, aber mit Quelle: Sleeper 2022–2026, NFL-Fantasy-Archiv 2016–2021, WhatsApp-Gruppe.</p>`;
 }
 
+/* ---------- Regeln ---------- */
+function renderRules() {
+  const ru = (nr, t, x, cls = '') => `<div class="ru ${cls}"><div class="nr">${nr}</div><div style="min-width:0"><div class="t">${t}</div>${x ? `<div class="x">${x}</div>` : ''}</div></div>`;
+  const fmt = [
+    ['🏈', 'Sleeper, 10 Teams, Half-PPR', 'Kein Kicker. Startaufstellung: QB, 2 RB, 2 WR, TE, 2 FLEX (RB/WR/TE), DEF.'],
+    ['🔢', 'Kein Head-to-Head: Rangpunkte', 'Jeder Spieltag wird nach Punkten sortiert. Das beste Team bekommt 9 Rangpunkte, das schwächste 0. Gewertet werden die Spieltage 1–14.'],
+    ['⚖️', 'Tabelle', 'Zuerst zählen die Rangpunkte. Bei Gleichstand entscheiden die Gesamtpunkte.'],
+    ['🏆', 'Playoffs (Spieltage 15–17)', 'Plätze 1–2 sind sicher im Halbfinale. Die Plätze 3–6 spielen die zwei weiteren Halbfinalisten aus. Das Finale dauert zwei Spieltage, die Punkte werden addiert.'],
+    ['💰', 'Waiver mit FAAB', '100 $ Budget pro Team und Saison. Das höchste Gebot gewinnt.'],
+  ];
+  const keep = [
+    ['Höchstens 2 Keeper pro Manager', 'Keine Pflicht. Wer niemanden behalten will, draftet komplett neu.'],
+    ['Höchstens 3 Saisons', 'Ein Spieler kann bis zu drei Saisons nach seiner Draft-Saison gekeept werden.'],
+    ['Kosten: Pick der Draft-Runde', 'Der Keeper kostet den Pick der Runde, in der er gedraftet wurde. Jedes weitere Jahr wird er eine Runde teurer.'],
+    ['Waiver- und Free-Agent-Spieler', 'Im ersten Keeper-Jahr kosten sie einen Pick aus Runde 10, danach jedes Jahr eine Runde mehr.'],
+    ['Trades', 'Der neue Manager übernimmt den Keeper-Preis. Die Laufzeit von 3 Jahren beginnt bei ihm neu.'],
+    ['Start 2027', '2026 war ein normaler Draft. Die ersten Keeper gibt es zum Draft 2027.'],
+  ];
+  $('v-rul').innerHTML = `<div class="card rhero"><div class="kicker">nflgt · Regelwerk</div><h2>Die Regeln</h2>
+      <p>Alles an einem Ort. Erst das Ligaformat, dann die Keeper-Regeln ab 2027. Was noch zur Abstimmung steht, ist blau markiert.</p></div>
+    <div class="card"><div class="ctitle">Ligaformat</div><div class="rl">${fmt.map(([n, t, x]) => ru(n, t, x, 'fmt')).join('')}</div></div>
+    <div class="card"><div class="ctitle">Keeper-Regeln · ab 2027</div><div class="rl">${keep.map(([t, x], i) => ru(i + 1, t, x)).join('')}</div></div>
+    <div class="card prop"><div class="ctitle blu">Fehlende Picks &amp; Keeper-Deadline <span class="vote">Vorschlag · Abstimmung</span></div>
+      <div class="rl">
+        <div class="ru vor"><div class="nr">7</div><div style="min-width:0"><div class="t">Keeper nur mit vorhandenem Pick</div><ul>
+          <li>Ein Spieler kann nur gekeept werden, wenn man zur Keeper-Deadline den <b>Pick der Kostenrunde besitzt</b>.</li>
+          <li>Pro Pick kann genau <b>ein</b> Keeper bezahlt werden.</li>
+          <li>Ein ertradeter Pick derselben Runde zählt genauso wie der eigene.</li>
+          <li>Ein abgegebener Pick gehört dem neuen Besitzer und zählt nicht mehr für eigene Keeper.</li>
+          <li>Ausweichen auf einen <b>späteren</b> Pick ist nicht erlaubt.</li>
+          <li>Ohne passenden Pick kommt der Spieler zurück in den normalen Draft-Pool.</li></ul></div></div>
+        <div class="ru vor"><div class="nr">8</div><div style="min-width:0"><div class="t">Keeper-Deadline</div><ul>
+          <li>Bis zur Deadline dürfen Spieler und Picks getradet werden.</li>
+          <li>So kann sich jeder einen fehlenden Pick noch rechtzeitig besorgen.</li>
+          <li>Danach gibt es genug Zeit, sich auf den Draft vorzubereiten.</li></ul></div></div>
+      </div></div>
+    <div class="card prop"><div class="ctitle blu">Beispiel · Erstrundenpick vertradet</div>
+      <p style="margin:0;color:var(--ink2);font-size:14px">Manager B hat zwei Spieler, die 2026 in Runde 1 gedraftet wurden. Er tradet seinen <b style="color:var(--ink)">Erstrundenpick 2027</b> an Manager A.</p>
+      <div class="tl">
+        <div class="k">2026</div><div class="v">Trade: Erstrundenpick 2027 geht an Manager A</div>
+        <div class="k">2027</div><div class="v">Manager B hat keinen Erstrundenpick → <b>kein Erstrunden-Keeper</b></div>
+        <div class="k">+1 Pick</div><div class="v">Ertradet er bis zur Deadline einen Erstrundenpick → <b>1 Keeper</b></div>
+        <div class="k">+2 Picks</div><div class="v">Mit zwei Erstrundenpicks kann er <b>beide Spieler</b> keepen</div>
+      </div>
+      <div class="info">Manager A hat 2027 zwei Erstrundenpicks: seinen eigenen und den von Manager B.</div></div>
+    <div class="card prop"><div class="ctitle blu">Warum diese Regel?</div><ul style="margin:0;padding-left:18px;color:var(--ink2);font-size:14px">
+      <li>Eindeutig, kein Schlupfloch, keine Folgeprobleme in späteren Jahren.</li>
+      <li>Draft-Picks werden zur echten Währung. Das macht Trades spannender.</li>
+      <li>Passt zur Grundidee: Niemand kann Stars dauerhaft günstig halten.</li>
+      <li style="color:var(--ink)"><b>Abstimmung in der Gruppe: Daumen hoch oder runter.</b></li></ul></div>
+    <div class="card"><div class="ctitle">Noch offen</div><div class="rl">
+      ${ru('?', 'Datum der Keeper-Deadline', 'Regel 8 legt eine Deadline fest, aber noch keinen Termin.', 'fmt')}
+      ${ru('?', 'Erstrunden-Keeper im zweiten Jahr', 'Ein Keeper wird jedes Jahr eine Runde teurer. Früher als Runde 1 geht es nicht. Bleibt er dann bei Runde 1?', 'fmt')}
+    </div></div>
+    <p class="foot">Stand: 12.10.2026. Regeln 7 und 8 gelten erst nach Zustimmung der Liga. Fehler gefunden? Bitte in die Gruppe.</p>`;
+}
+
 /* ---------- Museum ---------- */
 function renderMuseum() {
   const notes = [
@@ -435,7 +516,7 @@ function renderMuseum() {
 }
 
 $('stand').textContent = `Saison 2026 · nach Spieltag ${nW}`;
-renderTable(); renderWeeks(); renderHistory(); renderShame(); renderMuseum();
+renderTable(); renderWeeks(); renderHistory(); renderShame(); renderMuseum(); renderRules();
 let start = 'tab';
 try { const s = localStorage.getItem('nflgt-tab'); if (s && tabs[s]) start = s; } catch (e) {}
 showTab(start);
