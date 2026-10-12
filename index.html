@@ -439,24 +439,24 @@ function renderRules() {
     ['Start 2027', '2026 war ein normaler Draft. Die ersten Keeper gibt es zum Draft 2027.'],
   ];
   $('v-rul').innerHTML = `<div class="card rhero"><div class="kicker">nflgt · Regelwerk</div><h2>Die Regeln</h2>
-      <p>Alles an einem Ort. Erst das Ligaformat, dann die Keeper-Regeln ab 2027. Was noch zur Abstimmung steht, ist blau markiert.</p></div>
+      <p>Alles an einem Ort: erst das Ligaformat, dann die Keeper-Regeln ab 2027.</p></div>
     <div class="card"><div class="ctitle">Ligaformat</div><div class="rl">${fmt.map(([n, t, x]) => ru(n, t, x, 'fmt')).join('')}</div></div>
     <div class="card"><div class="ctitle">Keeper-Regeln · ab 2027</div><div class="rl">${keep.map(([t, x], i) => ru(i + 1, t, x)).join('')}</div></div>
-    <div class="card prop"><div class="ctitle blu">Fehlende Picks &amp; Keeper-Deadline <span class="vote">Vorschlag · Abstimmung</span></div>
+    <div class="card"><div class="ctitle">Fehlende Picks &amp; Keeper-Deadline</div>
       <div class="rl">
-        <div class="ru vor"><div class="nr">7</div><div style="min-width:0"><div class="t">Keeper nur mit vorhandenem Pick</div><ul>
+        <div class="ru"><div class="nr">7</div><div style="min-width:0"><div class="t">Keeper nur mit vorhandenem Pick</div><ul>
           <li>Ein Spieler kann nur gekeept werden, wenn man zur Keeper-Deadline den <b>Pick der Kostenrunde besitzt</b>.</li>
           <li>Pro Pick kann genau <b>ein</b> Keeper bezahlt werden.</li>
           <li>Ein ertradeter Pick derselben Runde zählt genauso wie der eigene.</li>
           <li>Ein abgegebener Pick gehört dem neuen Besitzer und zählt nicht mehr für eigene Keeper.</li>
           <li>Ausweichen auf einen <b>späteren</b> Pick ist nicht erlaubt.</li>
           <li>Ohne passenden Pick kommt der Spieler zurück in den normalen Draft-Pool.</li></ul></div></div>
-        <div class="ru vor"><div class="nr">8</div><div style="min-width:0"><div class="t">Keeper-Deadline</div><ul>
+        <div class="ru"><div class="nr">8</div><div style="min-width:0"><div class="t">Keeper-Deadline</div><ul>
           <li>Bis zur Deadline dürfen Spieler und Picks getradet werden.</li>
           <li>So kann sich jeder einen fehlenden Pick noch rechtzeitig besorgen.</li>
           <li>Danach gibt es genug Zeit, sich auf den Draft vorzubereiten.</li></ul></div></div>
       </div></div>
-    <div class="card prop"><div class="ctitle blu">Beispiel · Erstrundenpick vertradet</div>
+    <div class="card"><div class="ctitle">Beispiel · Erstrundenpick vertradet</div>
       <p style="margin:0;color:var(--ink2);font-size:14px">Manager B hat zwei Spieler, die 2026 in Runde 1 gedraftet wurden. Er tradet seinen <b style="color:var(--ink)">Erstrundenpick 2027</b> an Manager A.</p>
       <div class="tl">
         <div class="k">2026</div><div class="v">Trade: Erstrundenpick 2027 geht an Manager A</div>
@@ -465,16 +465,15 @@ function renderRules() {
         <div class="k">+2 Picks</div><div class="v">Mit zwei Erstrundenpicks kann er <b>beide Spieler</b> keepen</div>
       </div>
       <div class="info">Manager A hat 2027 zwei Erstrundenpicks: seinen eigenen und den von Manager B.</div></div>
-    <div class="card prop"><div class="ctitle blu">Warum diese Regel?</div><ul style="margin:0;padding-left:18px;color:var(--ink2);font-size:14px">
+    <div class="card"><div class="ctitle">Warum diese Regel?</div><ul style="margin:0;padding-left:18px;color:var(--ink2);font-size:14px">
       <li>Eindeutig, kein Schlupfloch, keine Folgeprobleme in späteren Jahren.</li>
       <li>Draft-Picks werden zur echten Währung. Das macht Trades spannender.</li>
-      <li>Passt zur Grundidee: Niemand kann Stars dauerhaft günstig halten.</li>
-      <li style="color:var(--ink)"><b>Abstimmung in der Gruppe: Daumen hoch oder runter.</b></li></ul></div>
+      <li>Passt zur Grundidee: Niemand kann Stars dauerhaft günstig halten.</li></ul></div>
     <div class="card"><div class="ctitle">Noch offen</div><div class="rl">
       ${ru('?', 'Datum der Keeper-Deadline', 'Regel 8 legt eine Deadline fest, aber noch keinen Termin.', 'fmt')}
       ${ru('?', 'Erstrunden-Keeper im zweiten Jahr', 'Ein Keeper wird jedes Jahr eine Runde teurer. Früher als Runde 1 geht es nicht. Bleibt er dann bei Runde 1?', 'fmt')}
     </div></div>
-    <p class="foot">Stand: 12.10.2026. Regeln 7 und 8 gelten erst nach Zustimmung der Liga. Fehler gefunden? Bitte in die Gruppe.</p>`;
+    <p class="foot">Stand: 12.10.2026. Fehler gefunden? Bitte in die Gruppe.</p>`;
 }
 
 /* ---------- Museum ---------- */
