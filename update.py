@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Holt abgeschlossene Spieltage von Sleeper und schreibt sie in index.html (const D = {...}).
 Läuft per GitHub Actions jeden Dienstag früh. Nur Python-Standardbibliothek."""
-import json, re, sys, urllib.request
+import json, re, sys, time, datetime, urllib.request
 
 LEAGUE = "1389357715347750912"
 SEASON = 2026
@@ -34,10 +34,19 @@ for r in rosters:
         sys.exit(f"Unbekannter Besitzer {dn}: bitte in D.teams eintragen")
     team_of[r["roster_id"]] = by_owner[dn]
 
-sched = get(f"https://api.sleeper.com/schedule/nfl/regular/{SEASON}")
+# Zeitstempel im Link, damit kein zwischengespeicherter (veralteter) Spielplan kommt
+sched = get(f"https://api.sleeper.com/schedule/nfl/regular/{SEASON}?t={int(time.time())}")
+today = datetime.datetime.now(datetime.timezone.utc).date().isoformat()
 def complete(w):
+    # Spiel zählt als beendet, wenn Sleeper es so markiert ODER sein (US-)Datum vor dem heutigen UTC-Datum liegt.
+    # Wird ein Spieltag zu früh übernommen, rechnet der nächste Lauf die letzte Woche ohnehin neu.
     g = [x for x in sched if x.get("week") == w]
-    return bool(g) and all(x.get("status") == "complete" for x in g)
+    return bool(g) and all(x.get("status") == "complete" or (x.get("date") or "9999") < today for x in g)
+for w in range(1, REG_WEEKS + 1):
+    g = [x for x in sched if x.get("week") == w]
+    if g and not complete(w):
+        print(f"Woche {w} offen:", ", ".join(f"{x.get('away')}@{x.get('home')} {x.get('status')} {x.get('date')}" for x in g if x.get("status") != "complete"))
+        break
 
 done = [w for w in range(1, REG_WEEKS + 1) if complete(w)]
 have = sorted(int(k) for k in D["weeks"])
